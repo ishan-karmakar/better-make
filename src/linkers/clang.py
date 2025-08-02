@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import subprocess
@@ -14,6 +15,10 @@ class Linker(linkers.LinkerDetection):
                 self.dependsOn(inp)
             self.inputs = inputs
             self.flags = []
+            if link_type == linkers.LinkType.SharedLibrary:
+                self.flags.extend(("-shared", "-fPIC"))
+            elif link_type == linkers.LinkType.StaticLibrary:
+                logging.error("Static library linking is not supported with Clang. Use the AR linker instead")
         
         def link_library(self, name: str):
             self.add_flags("-l" + name)

@@ -42,9 +42,6 @@ class InstallFile(PathStep):
     def get_path(self):
         return self.path
 
-def init_project(name: str):
-    pass
-
 def scan_kits():
     global CompileStep, LinkStep
     for compiler in KNOWN_COMPILERS:
@@ -55,12 +52,22 @@ def scan_kits():
     for linker in KNOWN_LINKERS:
         if linker.scan():
             LinkStep = linker.LinkStep
+            break
+    
+    assert CompileStep and LinkStep
 
-init_project("toy-compiler")
+def register_command(name: str):
+    commands[name] = Step()
+    return commands[name]
+
 scan_kits()
-assert CompileStep and LinkStep
+compile_step = CompileStep("main.cpp")
 commands["build"].dependsOn(InstallFile("compiler", LinkStep(
     linkers.LinkType.Executable,
-    CompileStep("main.cpp")
+    compile_step
+)))
+commands["build"].dependsOn(InstallFile("compiler.so", LinkStep(
+    linkers.LinkType.SharedLibrary,
+    compile_step
 )))
 commands["build"]()

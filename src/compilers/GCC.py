@@ -12,17 +12,22 @@ class Compiler(compilers.CompilerDetection):
         def __init__(self, filename: str):
             super().__init__()
             self.filename = filename
-            self.flags = []
+            self.path = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
+            self.cmdline = [
+                "g++",
+                "-c",
+                self.filename,
+                "-o",
+                self.path
+            ]
         
         def execute(self):
-            path = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
-            subprocess.run(["g++", "-c", self.filename, *self.flags, "-o", path]).check_returncode()
-            self.path = path
+            subprocess.run(self.cmdline).check_returncode()
             logging.info(f"Compiled {self.filename}")
         
         def add_include_dirs(self, *dirs: str):
             for dir in dirs:
-                self.flags.append("-I" + dir)
+                self.cmdline.append("-I" + dir)
         
         def get_path(self):
             return self.path
