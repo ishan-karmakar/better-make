@@ -4,6 +4,8 @@ import hashlib
 import os
 import shutil
 
+from dirs import CACHE_DIR
+
 class Step:
     def __init__(self):
         self.dependencies = []
@@ -46,7 +48,7 @@ class FilePath(PathStep):
     def __init__(self, filename: str):
         super().__init__()
         self.filename = filename
-        self.output = hashlib.sha256(self.filename.encode(), usedforsecurity=False).hexdigest() + os.path.splitext(filename)[1]
+        self.output = os.path.join(CACHE_DIR, hashlib.sha256(self.filename.encode(), usedforsecurity=False).hexdigest() + os.path.splitext(filename)[1])
 
     def execute(self):
         shutil.copy(self.filename, self.output)

@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import subprocess
+from dirs import CACHE_DIR
 import linkers
 from step import PathStep
 
@@ -24,14 +25,14 @@ class Linker(linkers.LinkerDetection):
             self.add_flags("-l" + name)
         
         def execute(self):
-            self.path = self.get_output()
             subprocess.run(["g++", *(f.get_path() for f in self.inputs), "-o", self.path, *self.flags]).check_returncode()
         
         def should_rerun(self) -> bool:
-            return os.path.isfile(self.get_output())
+            self.path = self.get_output()
+            return not os.path.isfile(self.path)
         
         def get_output(self):
-            return hashlib.sha256("".join([*(f.get_path() for f in self.inputs), *self.flags]).encode(), usedforsecurity=False).hexdigest()
+            return os.path.join(CACHE_DIR, hashlib.sha256("".join([*(f.get_path() for f in self.inputs), *self.flags]).encode(), usedforsecurity=False).hexdigest())
 
         def get_path(self):
             return self.path

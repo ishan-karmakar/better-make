@@ -1,9 +1,8 @@
 import logging
+import os
 import shutil
-import sys
-import binascii
-
 import compilers.GCC
+from dirs import OUT_DIR
 import linkers.GCC
 import compilers.clang
 import linkers.clang
@@ -38,11 +37,14 @@ class InstallFile(PathStep):
         super().__init__()
         self.dependsOn(file)
         self.file = file
-        self.path = name
+        self.path = os.path.join(OUT_DIR, name)
     
     def execute(self):
         shutil.copy(self.file.get_path(), self.path)
-    
+
+    def should_rerun(self) -> bool:
+        return not os.path.exists(self.path)
+
     def get_path(self):
         return self.path
 
@@ -66,6 +68,5 @@ scan_kits()
 
 assert CompileStep
 assert LinkStep
-commands["build"].dependsOn(LinkStep(CompileStep(FilePath("main.cpp"))))
-# commands["build"].dependsOn(InstallFile("compiler", LinkStep(CompileStep(FilePath("main.cpp")))))
+commands["build"].dependsOn(InstallFile("compiler", LinkStep(linkers.LinkType.Executable, CompileStep(FilePath("main.cpp")))))
 commands["build"]()
