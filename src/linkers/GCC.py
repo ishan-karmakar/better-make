@@ -26,7 +26,7 @@ class Linker(linkers.LinkerDetection):
         
         def execute(self):
             path = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
-            subprocess.run(["g++", *(f.get_path() for f in self.inputs), "-o", path, *self.flags])
+            subprocess.run(["g++", *(f.get_path() for f in self.inputs), "-o", path, *self.flags]).check_returncode()
             self.path = path
         
         def get_path(self):

@@ -5,6 +5,7 @@ import compilers.GCC
 import linkers.GCC
 import compilers.clang
 import linkers.clang
+import linkers.AR
 import compilers
 import linkers
 from step import Step, PathStep
@@ -68,6 +69,10 @@ commands["build"].dependsOn(InstallFile("compiler", LinkStep(
 )))
 commands["build"].dependsOn(InstallFile("compiler.so", LinkStep(
     linkers.LinkType.SharedLibrary,
+    compile_step
+)))
+commands["build"].dependsOn(InstallFile("compiler.a", linkers.AR.Linker.LinkStep(
+    linkers.LinkType.StaticLibrary,
     compile_step
 )))
 commands["build"]()
