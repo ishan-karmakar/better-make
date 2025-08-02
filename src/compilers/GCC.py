@@ -1,24 +1,28 @@
+import hashlib
 import compilers
 import shutil
 import subprocess
-import tempfile
-import uuid
-import logging
 import os
 from step import PathStep
 
 class Compiler(compilers.CompilerDetection):
     class CompileStep(PathStep, compilers.CompileStep):
-        def __init__(self, filename: str):
+        def __init__(self, source: PathStep):
             super().__init__()
-            self.filename = filename
+            self.dependsOn(source)
+            self.source = source
             self.flags = []
         
         def execute(self):
-            self.path = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
-            subprocess.run(["g++", "-c", self.filename, "-o", self.path, *self.flags]).check_returncode()
-            logging.info(f"Compiled {self.filename}")
+            self.path = self.get_output()
+            subprocess.run(["g++", "-c", self.source.get_path(), "-o", self.path, *self.flags]).check_returncode()
         
+        def should_rerun(self):
+            return not os.path.isfile(self.get_output())
+
+        def get_output(self):
+            return hashlib.sha256("".join([self.source.get_path(), *self.flags]).encode(), usedforsecurity=False).hexdigest() + ".o"
+
         def add_include_dirs(self, *dirs: str):
             for dir in dirs:
                 self.add_flags("-I" + dir)

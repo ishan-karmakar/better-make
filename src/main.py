@@ -1,5 +1,7 @@
 import logging
 import shutil
+import sys
+import binascii
 
 import compilers.GCC
 import linkers.GCC
@@ -8,7 +10,7 @@ import linkers.clang
 import linkers.AR
 import compilers
 import linkers
-from step import Step, PathStep
+from step import Step, PathStep, FilePath
 
 KNOWN_COMPILERS = [
     compilers.GCC.Compiler,
@@ -17,7 +19,8 @@ KNOWN_COMPILERS = [
 
 KNOWN_LINKERS = [
     linkers.GCC.Linker,
-    linkers.clang.Linker
+    linkers.clang.Linker,
+    linkers.AR.Linker
 ]
 
 CompileStep: type[compilers.CompileStep] | None = None
@@ -55,24 +58,14 @@ def scan_kits():
             LinkStep = linker.LinkStep
             break
     
-    assert CompileStep and LinkStep
-
 def register_command(name: str):
     commands[name] = Step()
     return commands[name]
 
 scan_kits()
-compile_step = CompileStep("main.cpp")
-commands["build"].dependsOn(InstallFile("compiler", LinkStep(
-    linkers.LinkType.Executable,
-    compile_step
-)))
-commands["build"].dependsOn(InstallFile("compiler.so", LinkStep(
-    linkers.LinkType.SharedLibrary,
-    compile_step
-)))
-commands["build"].dependsOn(InstallFile("compiler.a", linkers.AR.Linker.LinkStep(
-    linkers.LinkType.StaticLibrary,
-    compile_step
-)))
+
+assert CompileStep
+assert LinkStep
+commands["build"].dependsOn(LinkStep(CompileStep(FilePath("main.cpp"))))
+# commands["build"].dependsOn(InstallFile("compiler", LinkStep(CompileStep(FilePath("main.cpp")))))
 commands["build"]()

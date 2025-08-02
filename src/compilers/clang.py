@@ -9,16 +9,16 @@ from step import PathStep
 
 class Compiler(compilers.CompilerDetection):
     class CompileStep(PathStep, compilers.CompileStep):
-        def __init__(self, filename: str):
+        def __init__(self, source: PathStep):
             super().__init__()
-            self.filename = filename
+            self.source = source
             self.flags = []
         
         def execute(self):
             path = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
-            subprocess.run(["clang++", "-c", self.filename, *self.flags, "-o", path]).check_returncode()
+            subprocess.run(["clang++", "-c", self.source.get_path(), *self.flags, "-o", path]).check_returncode()
             self.path = path
-            logging.info(f"Compiled {self.filename}")
+            logging.info(f"Compiled {self.source.get_path()}")
 
         def add_include_dirs(self, *dirs: str):
             for dir in dirs:

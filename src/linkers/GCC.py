@@ -1,9 +1,8 @@
+import hashlib
 import logging
 import os
 import shutil
 import subprocess
-import tempfile
-import uuid
 import linkers
 from step import PathStep
 
@@ -25,10 +24,15 @@ class Linker(linkers.LinkerDetection):
             self.add_flags("-l" + name)
         
         def execute(self):
-            path = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
-            subprocess.run(["g++", *(f.get_path() for f in self.inputs), "-o", path, *self.flags]).check_returncode()
-            self.path = path
+            self.path = self.get_output()
+            subprocess.run(["g++", *(f.get_path() for f in self.inputs), "-o", self.path, *self.flags]).check_returncode()
         
+        def should_rerun(self) -> bool:
+            return os.path.isfile(self.get_output())
+        
+        def get_output(self):
+            return hashlib.sha256("".join([*(f.get_path() for f in self.inputs), *self.flags]).encode(), usedforsecurity=False).hexdigest()
+
         def get_path(self):
             return self.path
 
