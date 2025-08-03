@@ -1,24 +1,17 @@
-import abc
-from enum import Enum
+from . import GCC, clang, AR
+from ._linkers import LinkType
 
+KNOWN_LINKERS = [
+    GCC.Linker,
+    clang.Linker,
+    AR.Linker
+]
 
-class LinkType(Enum):
-    Executable = 1
-    SharedLibrary = 2
-    StaticLibrary = 3
+Step = None
 
-class LinkStep(abc.ABC):
-    def __init__(self):
-        self.flags = []
-
-    def add_flags(self, *flags: str):
-        self.flags.extend(flags)
-
-    def override_flags(self, *flags: str):
-        self.flags = list(flags)
-
-class LinkerDetection(abc.ABC):
-    @staticmethod
-    @abc.abstractmethod
-    def scan() -> bool:
-        raise NotImplementedError
+def scan_linkers():
+    global Step
+    for linker in KNOWN_LINKERS:
+        if linker.scan():
+            Step = linker.Step
+            break

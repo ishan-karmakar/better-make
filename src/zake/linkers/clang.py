@@ -6,9 +6,10 @@ import tempfile
 import uuid
 import linkers
 from step import PathStep
+from . import _linkers as linkers
 
 class Linker(linkers.LinkerDetection):
-    class LinkStep(PathStep, linkers.LinkStep):
+    class Step(PathStep, linkers.LinkStep):
         def __init__(self, link_type: linkers.LinkType, *inputs: PathStep):
             super().__init__()
             for inp in inputs:
