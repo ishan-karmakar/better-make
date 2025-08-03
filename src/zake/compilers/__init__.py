@@ -1,4 +1,5 @@
 from . import GCC, clang
+from ._compilers import *
 
 KNOWN_COMPILERS = [
     GCC.Compiler,

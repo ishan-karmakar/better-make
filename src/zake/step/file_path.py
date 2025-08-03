@@ -3,7 +3,7 @@ import hashlib
 import os
 import shutil
 from ..dirs import CACHE_DIR
-from ..step import PathStep
+from .path_step import PathStep
 
 class FilePath(PathStep):
     def __init__(self, filename: str):

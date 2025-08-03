@@ -1,11 +1,14 @@
 import logging
 import os
-import shutil
 import subprocess
 import tempfile
 import uuid
 from ..step import PathStep
 from . import _linkers as linkers
+from .._common import check_exec
+from ..config import parser
+
+parser.add_argument("--linker-path", help="Linker path", nargs="?")
 
 class Linker(linkers.LinkerDetection):
     class Step(PathStep, linkers.LinkStep):
@@ -33,4 +36,4 @@ class Linker(linkers.LinkerDetection):
     
     @staticmethod
     def scan() -> bool:
-        return shutil.which("clang++") is not None
+        return check_exec(parser.parse_args().linker_path, "clang++", "clang")

@@ -31,9 +31,3 @@ class Step:
         if self.changed:
             self.execute()
             self.run = True
-
-# Specialization of a Step that outputs a file
-class PathStep(Step):
-    @abc.abstractmethod
-    def get_path(self) -> str:
-        pass

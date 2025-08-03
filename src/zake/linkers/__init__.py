@@ -1,5 +1,5 @@
 from . import GCC, clang, AR
-from ._linkers import LinkType
+from ._linkers import *
 
 KNOWN_LINKERS = [
     GCC.Linker,

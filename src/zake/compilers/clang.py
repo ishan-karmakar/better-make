@@ -1,14 +1,17 @@
 import hashlib
 import os
-import shutil
 import subprocess
 
 from ..dirs import CACHE_DIR
 from ._compilers import *
 from ..step import PathStep
+from ..config import parser
+from .._common import check_exec
+
+parser.add_argument("--cpp-path", nargs="?", help="C++ executable path")
 
 class Compiler(CompilerDetection):
-    class CompileStep(PathStep, CompileStep):
+    class Step(PathStep, CompileStep):
         def __init__(self, source: PathStep):
             super().__init__()
             self.source = source
@@ -33,4 +36,4 @@ class Compiler(CompilerDetection):
     
     @staticmethod
     def scan() -> bool:
-        return shutil.which("clang++") is not None
+        return check_exec(parser.parse_args().cpp_path, "clang++", "clang")

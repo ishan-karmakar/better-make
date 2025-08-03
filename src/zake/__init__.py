@@ -1,14 +1,11 @@
 from .step import Step
+from . import config
 
 commands = {
-    "build": Step()
+    "build": Step(),
+    "clean": Step()
 }
 
-# def register_command(name: str):
-#     commands[name] = Step()
-#     return commands[name]
-
-# assert CompileStep
-# assert LinkStep
-# commands["build"].dependsOn(InstallFile("compiler", LinkStep(linkers.LinkType.Executable, CompileStep(FilePath("main.cpp")))))
-# commands["build"]()
+def register_command(name: str):
+    commands[name] = Step()
+    return commands[name]

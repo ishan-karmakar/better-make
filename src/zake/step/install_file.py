@@ -1,7 +1,7 @@
 import os
 import shutil
 from ..dirs import OUT_DIR
-from ..step import PathStep
+from .path_step import PathStep
 
 
 class InstallFile(PathStep):
