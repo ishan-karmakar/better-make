@@ -1,13 +1,13 @@
 import hashlib
-import compilers
 import shutil
 import subprocess
 import os
 from dirs import CACHE_DIR
 from step import PathStep
+from ._compilers import *
 
-class Compiler(compilers.CompilerDetection):
-    class CompileStep(PathStep, compilers.CompileStep):
+class Compiler(CompilerDetection):
+    class Step(PathStep, CompileStep):
         def __init__(self, source: PathStep):
             super().__init__()
             self.dependsOn(source)
