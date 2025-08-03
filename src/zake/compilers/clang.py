@@ -3,9 +3,9 @@ import os
 import shutil
 import subprocess
 
-from dirs import CACHE_DIR
+from ..dirs import CACHE_DIR
 from ._compilers import *
-from step import PathStep
+from ..step import PathStep
 
 class Compiler(CompilerDetection):
     class CompileStep(PathStep, CompileStep):

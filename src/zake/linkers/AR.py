@@ -2,9 +2,8 @@ import os
 import subprocess
 import tempfile
 import uuid
-import linkers
 import shutil
-from step import PathStep
+from ..step import PathStep
 from . import _linkers as linkers
 
 class Linker(linkers.LinkerDetection):

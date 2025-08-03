@@ -2,8 +2,8 @@ import hashlib
 import shutil
 import subprocess
 import os
-from dirs import CACHE_DIR
-from step import PathStep
+from ..dirs import CACHE_DIR
+from ..step import PathStep
 from ._compilers import *
 
 class Compiler(CompilerDetection):

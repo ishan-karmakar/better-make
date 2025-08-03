@@ -13,3 +13,4 @@ def scan_compilers():
         if compiler.scan():
             Step = compiler.Step
             break
+    assert Step

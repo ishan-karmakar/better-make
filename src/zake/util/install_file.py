@@ -1,7 +1,7 @@
 import os
 import shutil
-from zake.dirs import OUT_DIR
-from zake.step import PathStep
+from ..dirs import OUT_DIR
+from ..step import PathStep
 
 
 class InstallFile(PathStep):

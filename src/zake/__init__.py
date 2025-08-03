@@ -1,9 +1,4 @@
-import logging
-from step import Step
-import compilers, linkers
-
-logging.basicConfig()
-logging.root.setLevel(logging.NOTSET)
+from .step import Step
 
 commands = {
     "build": Step()
@@ -12,8 +7,6 @@ commands = {
 # def register_command(name: str):
 #     commands[name] = Step()
 #     return commands[name]
-compilers.scan_compilers()
-linkers.scan_linkers()
 
 # assert CompileStep
 # assert LinkStep

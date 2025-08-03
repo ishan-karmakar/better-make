@@ -2,8 +2,8 @@ import binascii
 import hashlib
 import os
 import shutil
-from zake.dirs import CACHE_DIR
-from zake.step import PathStep
+from ..dirs import CACHE_DIR
+from ..step import PathStep
 
 class FilePath(PathStep):
     def __init__(self, filename: str):

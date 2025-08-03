@@ -15,3 +15,4 @@ def scan_linkers():
         if linker.scan():
             Step = linker.Step
             break
+    assert Step

@@ -1,10 +1,4 @@
 import abc
-import binascii
-import hashlib
-import os
-import shutil
-
-from dirs import CACHE_DIR
 
 class Step:
     def __init__(self):

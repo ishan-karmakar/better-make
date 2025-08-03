@@ -3,9 +3,8 @@ import logging
 import os
 import shutil
 import subprocess
-from dirs import CACHE_DIR
-import linkers
-from step import PathStep
+from ..dirs import CACHE_DIR
+from ..step import PathStep
 from . import _linkers as linkers
 
 class Linker(linkers.LinkerDetection):
