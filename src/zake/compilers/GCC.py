@@ -5,9 +5,10 @@ from ..dirs import CACHE_DIR
 from ..step import PathStep
 from ._compilers import *
 from ..config import parser
-from .._common import check_exec
+from .. import _common as common
 
-parser.add_argument("--cpp-path", nargs="?", help="C++ executable path")
+if not common.check_arg_exists("cpp_path"):
+    parser.add_argument("--cpp-path", nargs="?", help="C++ executable path")
 
 class Compiler(CompilerDetection):
     class Step(PathStep, CompileStep):
@@ -36,4 +37,4 @@ class Compiler(CompilerDetection):
 
     @staticmethod
     def scan() -> bool:
-        return check_exec(parser.parse_args().cpp_path, "g++", "g++")
+        return common.check_exec(parser.parse_args().cpp_path, "g++", "g++")

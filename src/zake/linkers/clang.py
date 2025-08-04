@@ -1,14 +1,16 @@
 import logging
 import os
 import subprocess
-import tempfile
-import uuid
+import hashlib
+import json
 from ..step import PathStep
 from . import _linkers as linkers
-from .._common import check_exec
+from .. import _common as common
 from ..config import parser
+from ..dirs import CACHE_DIR
 
-parser.add_argument("--linker-path", help="Linker path", nargs="?")
+if not common.check_arg_exists("linker_path"):
+    parser.add_argument("--linker-path", help="Linker path", nargs="?")
 
 class Linker(linkers.LinkerDetection):
     class Step(PathStep, linkers.LinkStep):
@@ -18,22 +20,31 @@ class Linker(linkers.LinkerDetection):
                 self.dependsOn(inp)
             self.inputs = inputs
             self.flags = []
+            self.link_type = link_type
             if link_type == linkers.LinkType.SharedLibrary:
                 self.flags.extend(("-shared", "-fPIC"))
             elif link_type == linkers.LinkType.StaticLibrary:
-                logging.error("Static library linking is not supported with Clang. Use the AR linker instead")
+                logging.error("Clang does not support static library linking. Use the AR linker instead")
         
         def link_library(self, name: str):
             self.add_flags("-l" + name)
-        
+
         def execute(self):
-            path = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
-            subprocess.run(["clang++", *(f.get_path() for f in self.inputs), "-o", path, *self.flags]).check_returncode()
-            self.path = path
+            subprocess.run(["clang++", *(f.get_path() for f in self.inputs), "-o", self.path, *self.flags]).check_returncode()
         
+        def should_rerun(self) -> bool:
+            self.path = self.get_output()
+            return not os.path.isfile(self.path)
+        
+        def get_output(self):
+            return os.path.join(CACHE_DIR, hashlib.sha256(json.dumps({
+                "sources": (f.get_path() for f in self.inputs),
+                "flags": self.flags
+            }).encode(), usedforsecurity=False).hexdigest())
+
         def get_path(self):
             return self.path
     
     @staticmethod
     def scan() -> bool:
-        return check_exec(parser.parse_args().linker_path, "clang++", "clang")
+        return common.check_exec(parser.parse_args().linker_path, "clang++", "clang")

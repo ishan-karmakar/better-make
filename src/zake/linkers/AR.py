@@ -5,9 +5,10 @@ import uuid
 from ..step import PathStep
 from . import _linkers as linkers
 from ..config import parser
-from .._common import check_exec
+from .. import _common as common
 
-parser.add_argument("--linker-path", help="Linker path", nargs="?")
+if not common.check_arg_exists("linker_path"):
+    parser.add_argument("--linker-path", help="Linker path", nargs="?")
 
 class Linker(linkers.LinkerDetection):
     class Step(PathStep, linkers.LinkStep):
@@ -27,4 +28,4 @@ class Linker(linkers.LinkerDetection):
 
     @staticmethod
     def scan() -> bool:
-        return check_exec(parser.parse_args().linker_path, "ar", "GNU ar")
+        return common.check_exec(parser.parse_args().linker_path, "ar", "GNU ar")

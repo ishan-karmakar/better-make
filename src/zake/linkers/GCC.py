@@ -2,13 +2,15 @@ import hashlib
 import logging
 import os
 import subprocess
+import json
 from ..dirs import CACHE_DIR
 from ..step import PathStep
 from . import _linkers as linkers
-from .._common import check_exec
+from .. import _common as common
 from ..config import parser
 
-parser.add_argument("--linker-path", help="Linker path", nargs="?")
+if not common.check_arg_exists("linker_path"):
+    parser.add_argument("--linker-path", help="Linker path", nargs="?")
 
 class Linker(linkers.LinkerDetection):
     class Step(PathStep, linkers.LinkStep):
@@ -35,11 +37,14 @@ class Linker(linkers.LinkerDetection):
             return not os.path.isfile(self.path)
         
         def get_output(self):
-            return os.path.join(CACHE_DIR, hashlib.sha256("".join([*(f.get_path() for f in self.inputs), *self.flags]).encode(), usedforsecurity=False).hexdigest())
+            return os.path.join(CACHE_DIR, hashlib.sha256(json.dumps({
+                "sources": (f.get_path() for f in self.inputs),
+                "flags": self.flags
+            }).encode(), usedforsecurity=False).hexdigest())
 
         def get_path(self):
             return self.path
 
     @staticmethod
     def scan() -> bool:
-        return check_exec(parser.parse_args().linker_path, "g++", "g++")
+        return common.check_exec(parser.parse_args().linker_path, "g++", "g++")
