@@ -1,4 +1,8 @@
 import threading
+from ..config import parser
+
+parser.add_argument("--nprocs", help="Max number of concurrent threads", nargs="?")
+sem = threading.Semaphore(value=4)
 
 class Step:
     def __init__(self):
@@ -33,5 +37,7 @@ class Step:
         # We consider this task changed if any of the dependencies had to rerun or step itself needs to rerun
         self.changed = any(dep.changed for dep in self.dependencies) or self.should_rerun()
         if self.changed:
+            sem.acquire()
             self.execute()
+            sem.release()
             self.run = True
