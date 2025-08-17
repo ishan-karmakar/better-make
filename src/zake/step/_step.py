@@ -1,4 +1,4 @@
-import abc
+import threading
 
 class Step:
     def __init__(self):
@@ -13,18 +13,22 @@ class Step:
     def execute(self):
         pass
 
-    # Child steps should implement this for caching.
-    # For example, a compiler step would look at the update time of the input file and check if it is past the created/update time of output file
-    # Child steps don't have to worry about dependencies. That is handled by the generic Step class
     def should_rerun(self) -> bool:
         return False
 
     def __call__(self):
         if self.run:
             return
-        
-        for dep in self.dependencies:
-            dep()
+
+        if self.dependencies:
+            threads = []
+            for i in range(1, len(self.dependencies)):
+                thread = threading.Thread(target=self.dependencies[i])
+                thread.start()
+                threads.append(thread)
+            self.dependencies[0]()
+            for thread in threads:
+                thread.join()
 
         # We consider this task changed if any of the dependencies had to rerun or step itself needs to rerun
         self.changed = any(dep.changed for dep in self.dependencies) or self.should_rerun()

@@ -19,6 +19,7 @@ class Compiler(CompilerDetection):
             self.flags = []
         
         def execute(self):
+            self.path = self.get_output()
             subprocess.run(["g++", "-c", self.source.get_path(), "-o", self.path, *self.flags]).check_returncode()
         
         def should_rerun(self):

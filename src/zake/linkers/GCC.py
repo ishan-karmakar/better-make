@@ -30,6 +30,7 @@ class Linker(linkers.LinkerDetection):
             self.add_flags("-l" + name)
         
         def execute(self):
+            self.path = self.get_output()
             subprocess.run(["g++", *(f.get_path() for f in self.inputs), "-o", self.path, *self.flags]).check_returncode()
         
         def should_rerun(self) -> bool:
@@ -38,7 +39,7 @@ class Linker(linkers.LinkerDetection):
         
         def get_output(self):
             return os.path.join(CACHE_DIR, hashlib.sha256(json.dumps({
-                "sources": (f.get_path() for f in self.inputs),
+                "sources": [f.get_path() for f in self.inputs],
                 "flags": self.flags
             }).encode(), usedforsecurity=False).hexdigest())
 
