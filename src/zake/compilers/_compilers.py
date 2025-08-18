@@ -5,6 +5,7 @@ from ..dirs import CACHE_DIR
 import hashlib
 import json
 from checksumdir import dirhash
+import logging
 
 class CompileStep(PathStep):
     def __init__(self, source):
@@ -26,6 +27,14 @@ class CompileStep(PathStep):
     def execute(cmd):
         logging.info(f"Running {cmd}")
         return cmd
+
+    def should_rerun(self):
+        rerun = not os.path.isfile(self.get_path())
+        if rerun:
+            logging.debug(f"{self.get_path()} does not exist, must rerun this task")
+        else:
+            logging.debug(f"{self.get_path()} exists already, not need to rerun this task")
+        return rerun
 
     # High level method to add include directories
     @abc.abstractmethod

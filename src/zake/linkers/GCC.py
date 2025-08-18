@@ -28,9 +28,6 @@ class Linker(linkers.LinkerDetection):
         def execute(self):
             subprocess.run(linkers.LinkStep.execute(["g++", *(f.get_path() for f in self.inputs), "-o", self.get_path(), *self.flags])).check_returncode()
         
-        def should_rerun(self) -> bool:
-            return not os.path.isfile(self.get_path())
-        
     @staticmethod
     def scan() -> bool:
         return common.check_exec(parser.parse_args().linker_path, "g++", "g++")

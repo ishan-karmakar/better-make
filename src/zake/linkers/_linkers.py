@@ -22,8 +22,16 @@ class LinkStep(PathStep):
 
     @abc.abstractmethod
     def execute(cmd):
-        logging.debug(f"Running {cmd}")
+        logging.info(f"Running {cmd}")
         return cmd
+
+    def should_rerun(self):
+        rerun = not os.path.isfile(self.get_path())
+        if rerun:
+            logging.debug(f"{self.get_path()} does not exist, must rerun this task")
+        else:
+            logging.debug(f"{self.get_path()} exists, no need to rerun this task")
+        return rerun
 
     def add_flags(self, *flags: str):
         self.flags.extend(flags)
