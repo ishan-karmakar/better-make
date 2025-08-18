@@ -13,7 +13,7 @@ if not common.check_arg_exists("linker_path"):
     parser.add_argument("--linker-path", help="Linker path", nargs="?")
 
 class Linker(linkers.LinkerDetection):
-    class Step(PathStep, linkers.LinkStep):
+    class Step(linkers.LinkStep):
         def __init__(self, link_type: linkers.LinkType, *inputs: PathStep):
             super().__init__()
             for inp in inputs:
@@ -30,21 +30,11 @@ class Linker(linkers.LinkerDetection):
             self.add_flags("-l" + name)
 
         def execute(self):
-            subprocess.run(["clang++", *(f.get_path() for f in self.inputs), "-o", self.path, *self.flags]).check_returncode()
+            subprocess.run(linkers.LinkStep.execute(["clang++", *(f.get_path() for f in self.inputs), "-o", self.path, *self.flags])).check_returncode()
         
         def should_rerun(self) -> bool:
-            self.path = self.get_output()
-            return not os.path.isfile(self.path)
+            return not os.path.isfile(self.get_path())
         
-        def get_output(self):
-            return os.path.join(CACHE_DIR, hashlib.sha256(json.dumps({
-                "sources": (f.get_path() for f in self.inputs),
-                "flags": self.flags
-            }).encode(), usedforsecurity=False).hexdigest())
-
-        def get_path(self):
-            return self.path
-    
     @staticmethod
     def scan() -> bool:
         return common.check_exec(parser.parse_args().linker_path, "clang++", "clang")

@@ -12,14 +12,13 @@ if not common.check_arg_exists("cpp_path"):
     parser.add_argument("--cpp-path", nargs="?", help="C++ executable path")
 
 class Compiler(CompilerDetection):
-    class Step(PathStep, CompileStep):
+    class Step(CompileStep):
         def __init__(self, source: PathStep):
-            super().__init__()
-            self.source = source
+            super().__init__(source)
             self.flags = []
         
         def execute(self):
-            subprocess.run(["clang++", "-c", self.source.get_path(), "-o", self.path, *self.flags]).check_returncode()
+            subprocess.run(CompileStep.execute(["clang++", "-c", self.source.get_path(), "-o", self.path, *self.flags])).check_returncode()
         
         def should_rerun(self):
             self.path = self.get_output()

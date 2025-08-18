@@ -1,8 +1,9 @@
 import threading
 from ..config import parser
+import os
 
 parser.add_argument("--nprocs", help="Max number of concurrent threads", nargs="?")
-sem = threading.Semaphore(value=4)
+sem = threading.Semaphore(value=parser.parse_args().nprocs or os.cpu_count())
 
 class Step:
     def __init__(self):
